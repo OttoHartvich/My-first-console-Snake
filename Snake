@@ -1,0 +1,244 @@
+using System;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
+
+namespace Snake
+{
+
+    class Cord
+    {
+        public int X { get; set; }
+        public int Y { get; set; }
+
+        public bool IsEqual(Cord other)
+        {
+            return other.X == X && other.Y == Y;
+        }
+    }
+
+    class Program
+    {
+        static ConsoleKey lastPressedKey;
+
+
+        static void Main()
+        {
+
+            /// map boundaries -5,5 -5e,5
+
+            /// var cord = new Cord { X = 1, Y = 2 };
+
+
+            Task.Run(readKey);
+
+            RunGame();
+        }
+
+        static void readKey()
+        {
+            while (true)
+            {
+
+                lastPressedKey = Console.ReadKey(false).Key;
+            }
+        }
+
+        static void RunGame()
+        {
+            bool Appleeat;
+            int refreshInteralMs = 1000;
+            int level = 0;
+
+
+            List<Cord> Apple = new List<Cord>
+            {
+                new Cord{X = 3, Y=3},
+
+            };
+
+            List<Cord> Snake = new List<Cord>
+            {
+                new Cord{X = 5, Y=6},
+                new Cord{X = 5, Y=5},
+                new Cord{X = 5, Y=4},
+                new Cord{X = 5, Y=3},
+                //new Vector([[5, 5][5, 6][5, 7]]);
+            };
+
+
+            while (true)
+            {
+                foreach (Cord part in Snake)
+
+                {
+
+                    if (Snake[0].X != part.X && Snake[0].Y != part.Y)
+                    {
+
+                    }
+                    else
+                    {
+                        //Console.WriteLine("GAME OVER");
+                        //Thread.Sleep(100000000);
+                    }
+
+
+                }
+
+
+                var newHead = new Cord { };
+                switch (lastPressedKey)
+                {
+                    case ConsoleKey.LeftArrow:
+                        newHead.X = Snake[0].X - 1;
+                        newHead.Y = Snake[0].Y;
+
+                        break;
+                    case ConsoleKey.UpArrow:
+                        newHead.X = Snake[0].X;
+                        newHead.Y = Snake[0].Y - 1;
+
+                        break;
+                    case ConsoleKey.DownArrow:
+                        newHead.X = Snake[0].X;
+                        newHead.Y = Snake[0].Y + 1;
+
+                        break;
+                    case ConsoleKey.RightArrow:
+                        newHead.X = Snake[0].X + 1;
+                        newHead.Y = Snake[0].Y;
+
+                        break;
+                }
+
+                if (lastPressedKey == 0)
+                {
+                    newHead.X = 2 * Snake[0].X - Snake[1].X;
+                    newHead.Y = 2 * Snake[0].Y - Snake[1].Y;
+
+                }
+
+
+
+
+                Cord apple = Apple[0];
+                Cord head = Snake[0];
+
+                Appleeat = apple.X == head.X && apple.Y == head.Y;
+
+
+                Snake.Insert(0, newHead);
+
+
+
+                if (Appleeat == false)
+                {
+                    Snake.RemoveAt(Snake.Count - 1);
+                }
+                else
+                {
+                    Random rnd = new Random();
+                    bool col;
+                    do
+                    {
+                        col = false;
+
+                        Apple[0].X = rnd.Next(1, 10);
+                        Apple[0].Y = rnd.Next(1, 10);
+
+                        foreach (Cord part in Snake)
+                        {
+                            if (Apple[0].X == part.X && Apple[0].Y == part.Y)
+                            {
+                                col = true;
+                                break;
+                            }
+                        }
+                    }
+                    while (col == true);
+                    if (refreshInteralMs > 200)
+
+                    {
+                        level++;
+                        refreshInteralMs = levelUp(refreshInteralMs, level);
+                    }
+                }
+
+
+                if (Snake[0].X < 1 || Snake[0].X > 10 || Snake[0].Y < 1 || Snake[0].Y > 10)
+                {
+                    Console.WriteLine("GAME OVER");
+                    Console.ReadKey();
+                }
+
+
+
+                //// map drawing
+                List<char> map = new List<char>();
+
+                int i = 0;
+                while (i < 148)
+
+                {
+                    float ii = i;
+                    float plotvert = ii / 12;
+                    float plotvert2 = (ii + 1) / 12;
+
+                    if (plotvert != Math.Round(plotvert) && i > 11 && i < 133 && plotvert2 != Math.Round(plotvert2))
+                    {
+                        map.Add(' ');
+                    }
+                    else
+                    { map.Add('#'); }
+                    i++;
+                }
+
+                foreach (Cord part in Snake)
+
+                {
+                    int coor = part.Y * 12 + part.X;
+                    map[coor] = 'O';
+                }
+                int posApple = Apple[0].Y * 12 + Apple[0].X;
+                map[posApple] = 'A';
+
+                var mapLine = map.ToArray();
+
+                i = 0;
+                int l = 0;
+
+                Console.Clear(); /// vycisteni konzole
+
+                while (l < 12)
+                {
+                    i = 0;
+                    while (i < 12)
+                    {
+                        int v = i + l * 12;
+
+                        char value = mapLine[v];
+
+                        Console.Write(value);
+                        i++;
+                    }
+                    Console.Write(Environment.NewLine);
+                    l++;
+                }
+
+                Console.WriteLine("Level:", level);
+
+
+
+
+                Thread.Sleep(refreshInteralMs);
+            }
+        }
+
+        private static int levelUp(int refreshInteralMs, int level)
+        {
+            return refreshInteralMs - level * 10;
+        }
+    }
+
+}
