@@ -226,8 +226,8 @@ namespace Snake
                     l++;
                 }
 
-                Console.WriteLine("Level:", level);
-
+                Console.WriteLine("Level:");
+                Console.WriteLine(level);
 
 
 
